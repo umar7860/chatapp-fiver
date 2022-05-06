@@ -2,6 +2,7 @@ package com.example.chatapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -10,12 +11,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class loginActivity extends AppCompatActivity {
     TextInputEditText username;
     TextInputEditText password;
     DataBaseHandler dataBaseHandler;
     Button signup;
-    Users users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class loginActivity extends AppCompatActivity {
 
             s = dataBaseHandler.isLogged(username.getText().toString(), password.getText().toString());
             if (s) {
+                Log.e("ID", String.valueOf(DataBaseHandler.logged_username));
                 Toast.makeText(this, "Logging Successfully", Toast.LENGTH_SHORT).show();
                 //onDestroy();
                 startActivity(new Intent(getApplicationContext(),MainActivity.class));
