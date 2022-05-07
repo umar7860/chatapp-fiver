@@ -24,11 +24,17 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -44,33 +50,41 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class PostActivities extends AppCompatActivity implements actionOnPosts {
-    FloatingActionButton fab;
-    DataBaseHandler db;
-    Button fromCamera, fromGallery;
-    BottomSheetDialog bottomSheetDialog;
+public class PostActivities extends AppCompatActivity implements actionOnPosts{
+    private FloatingActionButton fab;
+    private Toolbar toolbar;
+    private DataBaseHandler db;
+    private Button fromCamera, fromGallery;
+    private BottomSheetDialog bottomSheetDialog;
     private static final int PERMISSION_CODE = 1000;
     private static final int IMAGE_CODE = 1001;
     private static final int RESULT_LOAD_IMG = 1002;
-    String imageFilePathCamera,username;
-    ImageView image;
-    Intent cameraInt;
-    RecyclerView recyclerView;
-    Bitmap selectedImage;
-    EditText message_search;
-    PostRecyclerAdapter adapter;
+    private String imageFilePathCamera, username;
+    private ImageView image;
+    private TextView itemCounter;
+    private Intent cameraInt;
+    private RecyclerView recyclerView;
+    private Bitmap selectedImage;
+    private EditText message_search;
+    private PostRecyclerAdapter adapter;
     static Uri ImageUriFromCamera, ImageUriFromGallery;
-    List<Post> posts_list;
+    List<Post> posts_list, selected_posts;
+    int counter = 0;
+    boolean isContexualModelEnabled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_activities);
         db = new DataBaseHandler(this);
+        selected_posts = new ArrayList<>();
+        itemCounter = findViewById(R.id.itemCounter);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         Bundle bundle = getIntent().getExtras();
         username = bundle.getString("username");
-
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Posts");
         if (username.equals(DataBaseHandler.logged_username)) {
             fab.show();
         } else {
@@ -103,21 +117,27 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //////////////
+        getMenuInflater().inflate(R.menu.option_menu, menu);
+        return true;
+    }
+
     private void searchData(CharSequence charSequence) {
         ArrayList<Post> mPosts = new ArrayList<>();
         //users = new ArrayList<>();
 
 
-        for (Post user : posts_list){
+        for (Post user : posts_list) {
             //Log.e("TAG", "searchData: " +  searchText );
-            if (user.getMessage().toLowerCase().contains(charSequence))
-            {
-                Log.e("TAG", "searchData: " +  charSequence );
+            if (user.getMessage().toLowerCase().contains(charSequence)) {
+                Log.e("TAG", "searchData: " + charSequence);
                 mPosts.add(user);
 
             }
         }
-        adapter = new PostRecyclerAdapter(mPosts,this);
+        adapter = new PostRecyclerAdapter(mPosts, this, PostActivities.this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -128,7 +148,7 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts {
     private void setRecyclerView() {
         posts_list = db.getPosts(username);
         recyclerView = (RecyclerView) findViewById(R.id.posts_recycler_view);
-        adapter = new PostRecyclerAdapter(posts_list,this);
+        adapter = new PostRecyclerAdapter(posts_list, this, PostActivities.this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -182,20 +202,20 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts {
                 post.setUser_name(DataBaseHandler.logged_username);
                 Boolean ln = false;
                 if (selectedImage != null) {
-                    Log.e("Image with",selectedImage.toString());
-                    ln = db.savePost(post,getBitmapAsByteArray(selectedImage));
+                    Log.e("Image with", selectedImage.toString());
+                    ln = db.savePost(post, getBitmapAsByteArray(selectedImage));
 
                 } else {
                     Drawable d = getDrawable(R.drawable.logo);
-                    selectedImage = ((BitmapDrawable)d).getBitmap();
-                    ln = db.savePost(post,getBitmapAsByteArray(selectedImage));
+                    selectedImage = ((BitmapDrawable) d).getBitmap();
+                    ln = db.savePost(post, getBitmapAsByteArray(selectedImage));
                 }
                 if (ln) {
                     setRecyclerView();
                     dialog_1.dismiss();
-                    Toast.makeText(getApplicationContext(),"Data inserted Successfully",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Data inserted Successfully", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getApplicationContext(),"Data not inserted",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Data not inserted", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -267,9 +287,9 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts {
             if (requestCode == IMAGE_CODE) {
                 //Set the image to imageView
                 try {
-                     //selectedImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(), ImageUriFromCamera);
+                    //selectedImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(), ImageUriFromCamera);
                     final InputStream imageStream = getContentResolver().openInputStream(ImageUriFromCamera);
-                    selectedImage = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(imageStream),96, 96, true);
+                    selectedImage = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(imageStream), 96, 96, true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -281,16 +301,16 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts {
                     final Uri imageUri = data.getData();
                     if (!imageUri.equals("")) {
                         final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                        selectedImage = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(imageStream),96, 96, true);
+                        selectedImage = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(imageStream), 96, 96, true);
                         image.setImageBitmap(selectedImage);
                     } else {
 //                        Drawable d = getDrawable(R.drawable.logo);
 //                        selectedImage = ((BitmapDrawable)d).getBitmap();
                     }
                 } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
-                    }
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                }
 
 
             }
@@ -304,6 +324,7 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts {
         imageFilePathCamera = createTempFile.getAbsolutePath();
         return createTempFile;
     }
+
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
@@ -312,29 +333,83 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts {
 
     @Override
     public void showDetail(Post post) {
-        Intent i = new Intent(getApplicationContext(),postDetailActivity.class);
+        Intent i = new Intent(getApplicationContext(), postDetailActivity.class);
         Bundle b = new Bundle();
-        b.putString("message",post.getMessage());
+        b.putInt("id", post.getID());
+        b.putString("message", post.getMessage());
+        b.putString("username", post.getUser_name());
         i.putExtras(b);
         if (post.getImage() != null) {
-            i.putExtra("Image",scaleDownBitmap(post.getImage(),50,this));
+            i.putExtra("Image", scaleDownBitmap(post.getImage(), 50, this));
         }
         startActivity(i);
     }
 
     @Override
-    public void showContextMenu(int post_id) {
-
+    public void lonGPress() {
+        isContexualModelEnabled = true;
+        toolbar.getMenu().clear();
+        toolbar.inflateMenu(R.menu.menu);
+        getSupportActionBar().setTitle("0 Item Selected");
+        toolbar.setBackgroundColor(getResources().getColor(R.color.blue));
+        PostRecyclerAdapter adapter = new PostRecyclerAdapter(posts_list,this,PostActivities.this);
+        recyclerView.setAdapter(adapter);
     }
+
+
     public static Bitmap scaleDownBitmap(Bitmap photo, int newHeight, Context context) {
 
         final float densityMultiplier = context.getResources().getDisplayMetrics().density;
 
-        int h= (int) (newHeight*densityMultiplier);
-        int w= (int) (h * photo.getWidth()/((double) photo.getHeight()));
+        int h = (int) (newHeight * densityMultiplier);
+        int w = (int) (h * photo.getWidth() / ((double) photo.getHeight()));
 
-        photo=Bitmap.createScaledBitmap(photo, w, h, true);
+        photo = Bitmap.createScaledBitmap(photo, w, h, true);
 
         return photo;
     }
+
+    @Override
+    protected void onRestart() {
+        setRecyclerView();
+        super.onRestart();
+    }
+    public void makeSelection(View view, int adapterPosition) {
+        if (((CheckBox) view).isChecked()) {
+            selected_posts.add(posts_list.get(adapterPosition));
+            this.counter++;
+            updateCounter();
+        } else {
+            selected_posts.remove(posts_list.get(adapterPosition));
+            this.counter--;
+            updateCounter();
+        }
+    }
+
+    public void updateCounter() {
+        itemCounter.setText(this.counter + "Item Selected");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_delete) {
+            adapter.removeItems(selected_posts);
+            finish();
+            RemoveContextualActionMenu();
+        }
+        if (item.getItemId() == R.id.share) {
+
+        }
+        return true;
+    }
+
+    public void RemoveContextualActionMenu() {
+        isContexualModelEnabled = false;
+        itemCounter.setText("Posts");
+        toolbar.getMenu().clear();
+        counter = 0;
+        selected_posts.clear();
+        adapter.notifyDataSetChanged();
+    }
+
 }

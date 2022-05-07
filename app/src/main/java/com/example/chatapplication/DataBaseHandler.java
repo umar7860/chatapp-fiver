@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,16 +29,13 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 //            + KEY_ID + " INTEGER PRIMARY KEY," + Email + " TEXT,"
 
 
-
-    String q_1= "Create table Users (Email Text,UserName Text  Primary key , password TEXT )";
+    String q_1 = "Create table Users (Email Text,UserName Text  Primary key , password TEXT )";
     //String query = "Create table Users (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,Email TEXT, Username TEXT, password TEXT, UNIQUE (Username))";
-    String q_2= "Create table Posts (message Text, user_name Text,image BLOB, ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)";
+    String q_2 = "Create table Posts (message Text, user_name Text,image BLOB, ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)";
 
-    public DataBaseHandler(@Nullable Context context)
-    {
-        super(context,DATABASE_NAME,null,DATABASE_VERSION);
+    public DataBaseHandler(@Nullable Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
-
 
 
     @Override
@@ -56,41 +54,36 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         onCreate(db);
 
     }
+
     //Adding information to the database
-    public Boolean addInformation(com.example.chatapplication.Users users)
-    {
+    public Boolean addInformation(com.example.chatapplication.Users users) {
         Boolean result;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(User_name,users.getUsername());
-        values.put(Email,users.getEmail());
-        values.put(Password,users.getPassword());
-        long id = db.insert(User_TABLE,null,values);
+        values.put(User_name, users.getUsername());
+        values.put(Email, users.getEmail());
+        values.put(Password, users.getPassword());
+        long id = db.insert(User_TABLE, null, values);
         db.close();
-        if (id== -1)
-        {
+        if (id == -1) {
             result = false;
-        }
-        else
-        {
+        } else {
             result = true;
-            addPost();
+            //addPost();
 
         }
-        return  result;
+        return result;
     }
+
     //Getting all the users data that is stored in the databse
-    public List<Users> getContacts()
-    {
+    public List<Users> getContacts() {
         List<Users> userlist = new ArrayList<Users>();
         String selectQuery = "SELECT  * FROM " + User_TABLE;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery,null);
+        Cursor cursor = db.rawQuery(selectQuery, null);
         //Looping all the rows
-        if (cursor.moveToNext())
-        {
-            do
-            {
+        if (cursor.moveToNext()) {
+            do {
                 Users users = new Users();
                 users.setEmail(cursor.getString(0));
                 users.setUsername(cursor.getString(1));
@@ -104,14 +97,14 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
 
     }
-    public Boolean isLogged(String Username1, String passwords)
-    {
+
+    public Boolean isLogged(String Username1, String passwords) {
         boolean choice = false;
         SQLiteDatabase db = this.getReadableDatabase();
         String[] col = {User_name};
         String selection = User_name + "=?" + " and " + Password + " =?";
-        String [] selectionArguments = {Username1, passwords};
-        Cursor cursor = db.query(User_TABLE,col,selection,selectionArguments,null,null,null);
+        String[] selectionArguments = {Username1, passwords};
+        Cursor cursor = db.query(User_TABLE, col, selection, selectionArguments, null, null, null);
         choice = cursor.getCount() > 0;//True
         cursor.close();
         if (choice) {
@@ -119,29 +112,28 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         }
         return choice;
     }
+
     public Boolean savePost(Post post, byte[] image) {
         Boolean result;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(Message,post.getMessage());
-        values.put("user_name",post.getUser_name());
+        values.put(Message, post.getMessage());
+        values.put("user_name", post.getUser_name());
         values.put("image", image);
-        long id = db.insert(Post_table,null,values);
+        long id = db.insert(Post_table, null, values);
         db.close();
         result = id != -1;
-        return  result;
+        return result;
     }
-    public List<Post> getPosts(String  username)
-    {
+
+    public List<Post> getPosts(String username) {
         List<Post> posts_list = new ArrayList<Post>();
-        String selectQuery = "SELECT  * FROM Posts where user_name='" + username+"'";
+        String selectQuery = "SELECT  * FROM Posts where user_name='" + username + "'";
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery,null);
+        Cursor cursor = db.rawQuery(selectQuery, null);
         //Looping all the rows
-        if (cursor.moveToNext())
-        {
-            do
-            {
+        if (cursor.moveToNext()) {
+            do {
                 Post post = new Post();
                 post.setMessage(cursor.getString(0));
                 post.setUser_name(cursor.getString(1));
@@ -160,13 +152,30 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
 
     }
-    private  void addPost() {
+
+    //    private  void addPost() {
+////        SQLiteDatabase db = this.getWritableDatabase();
+////        ContentValues values = new ContentValues();
+////        values.put(Message,"This is just demo post");
+////        values.put("user_name",DataBaseHandler.logged_username);
+////        long id = db.insert(Post_table,null,values);
+////        db.close();
+//    }
+    public boolean deletePost(String rowId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete("posts", "ID" + "=" + rowId, null) > 0;
+    }
+
+    public boolean updatePost(Post post, byte[] image) {
+        Boolean result;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(Message,"This is just demo post");
-        values.put("user_name",DataBaseHandler.logged_username);
-        long id = db.insert(Post_table,null,values);
+        values.put(Message, post.getMessage());
+        values.put("image", image);
+        long id = db.update("posts", values, "ID = ?", new String[]{"" + post.getID()});
         db.close();
+        result = id != -1;
+        return result;
     }
 
 }
