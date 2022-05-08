@@ -110,7 +110,7 @@ public class postDetailActivity extends AppCompatActivity {
                 return true;
             }
             case R.id.share: {
-                sendEmail(bitmap,message);
+                sendEmail(bitmap, message);
                 return true;
             }
             case R.id.delete: {

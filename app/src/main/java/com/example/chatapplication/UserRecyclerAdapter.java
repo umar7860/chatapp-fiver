@@ -14,18 +14,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class UserRecyclerAdapter extends RecyclerView.Adapter<UserRecyclerAdapter.ViewHolder>{
+public class UserRecyclerAdapter extends RecyclerView.Adapter<UserRecyclerAdapter.ViewHolder> {
     private List<Users> listdata;
     private OnClickAction action_interface;
-    public UserRecyclerAdapter (List<Users> listdata1, OnClickAction action_interface) {
+
+    public UserRecyclerAdapter(List<Users> listdata1, OnClickAction action_interface) {
         this.listdata = listdata1;
         this.action_interface = action_interface;
     }
+
     @NonNull
     @Override
     public UserRecyclerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        View listItem= layoutInflater.inflate(R.layout.list_item, parent, false);
+        View listItem = layoutInflater.inflate(R.layout.list_item, parent, false);
         ViewHolder viewHolder = new ViewHolder(listItem);
         return viewHolder;
     }
@@ -40,7 +42,7 @@ public class UserRecyclerAdapter extends RecyclerView.Adapter<UserRecyclerAdapte
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            action_interface.openPosts(user);
+                action_interface.openPosts(user);
             }
         });
 
@@ -55,7 +57,8 @@ public class UserRecyclerAdapter extends RecyclerView.Adapter<UserRecyclerAdapte
         public ImageView imageView;
         public TextView textView;
         public RelativeLayout relativeLayout;
-        public ViewHolder (View itemView) {
+
+        public ViewHolder(View itemView) {
             super(itemView);
             this.imageView = itemView.findViewById(R.id.imageView);
             this.textView = itemView.findViewById(R.id.textView);

@@ -8,15 +8,14 @@
     tools:context=".loginActivity">
 
 
-
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="@dimen/_10sdp"
         android:layout_marginLeft="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_170sdp"
-        app:cardCornerRadius="18dp"
-        android:background="@color/white">
+        android:layout_marginRight="@dimen/_10sdp"
+        android:background="@color/white"
+        app:cardCornerRadius="18dp">
 
         <LinearLayout
             android:layout_width="match_parent"

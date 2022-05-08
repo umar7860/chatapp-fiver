@@ -26,17 +26,16 @@ public class loginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         username = (TextInputEditText) findViewById(R.id.username1);
         password = (TextInputEditText) findViewById(R.id.password1);
-        signup = (Button)findViewById(R.id.signup);
+        signup = (Button) findViewById(R.id.signup);
         dataBaseHandler = new DataBaseHandler(this);
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(),signUp.class);
+                Intent i = new Intent(getApplicationContext(), signUp.class);
                 startActivity(i);
             }
         });
     }
-
 
 
     public void login(View view) {
@@ -48,7 +47,7 @@ public class loginActivity extends AppCompatActivity {
                 Log.e("ID", String.valueOf(DataBaseHandler.logged_username));
                 Toast.makeText(this, "Logging Successfully", Toast.LENGTH_SHORT).show();
                 //onDestroy();
-                startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
             }
             if (!s) {

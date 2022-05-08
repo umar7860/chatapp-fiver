@@ -14,7 +14,7 @@ public class BitmapSaver {
         String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
         File myDir = new File(root + "/saved_images");
         myDir.mkdirs();
-        long n  = System.currentTimeMillis() / 1000L;
+        long n = System.currentTimeMillis() / 1000L;
         String fname = "Image-" + n + ".jpg";
         File file = new File(myDir, fname);
         if (file.exists())
@@ -24,8 +24,7 @@ public class BitmapSaver {
             finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

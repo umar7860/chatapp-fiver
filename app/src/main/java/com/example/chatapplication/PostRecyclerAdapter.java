@@ -85,7 +85,7 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter<PostRecyclerAdapte
             String id = String.valueOf(selected_posts.get(i).getID());
             db.deletePost(id);
             listdata.remove(selected_posts.get(i));
-            Toast.makeText(activity,"Posts are deleted successfully",Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Posts are deleted successfully", Toast.LENGTH_SHORT).show();
             notifyDataSetChanged();
         }
     }
@@ -114,6 +114,7 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter<PostRecyclerAdapte
             this.view = itemView;
             checkbox.setOnClickListener(this);
         }
+
         @Override
         public void onClick(View view) {
             activity.makeSelection(view, getAdapterPosition());
