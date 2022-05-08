@@ -110,7 +110,7 @@ public class postDetailActivity extends AppCompatActivity {
                 return true;
             }
             case R.id.share: {
-                sendEmail(bitmap);
+                sendEmail(bitmap,message);
                 return true;
             }
             case R.id.delete: {
@@ -306,7 +306,7 @@ public class postDetailActivity extends AppCompatActivity {
         return createTempFile;
     }
 
-    public void sendEmail(Bitmap m) {
+    public void sendEmail(Bitmap m, String message) {
 
         File file = BitmapSaver.saveImageToExternalStorage(this, m);
 

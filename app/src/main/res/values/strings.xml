@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ChatApplication</string>
+    <string name="app_name">Social media client</string>
     <string name="delete">Delete</string>
     <string name="share">Share</string>
     <string name="edit">Edit</string>

@@ -50,7 +50,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class PostActivities extends AppCompatActivity implements actionOnPosts{
+public class PostActivities extends AppCompatActivity implements actionOnPosts {
     private FloatingActionButton fab;
     private Toolbar toolbar;
     private DataBaseHandler db;
@@ -347,13 +347,17 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts{
 
     @Override
     public void lonGPress() {
-        isContexualModelEnabled = true;
-        toolbar.getMenu().clear();
-        toolbar.inflateMenu(R.menu.menu);
-        getSupportActionBar().setTitle("0 Item Selected");
-        toolbar.setBackgroundColor(getResources().getColor(R.color.blue));
-        PostRecyclerAdapter adapter = new PostRecyclerAdapter(posts_list,this,PostActivities.this);
-        recyclerView.setAdapter(adapter);
+        if (username.equals(DataBaseHandler.logged_username)) {
+            isContexualModelEnabled = true;
+            toolbar.getMenu().clear();
+            toolbar.inflateMenu(R.menu.menu);
+            //getSupportActionBar().setTitle("0 Item Selected");
+            itemCounter.setText("0 Item Selected");
+            toolbar.setBackgroundColor(getResources().getColor(R.color.blue));
+            PostRecyclerAdapter adapter = new PostRecyclerAdapter(posts_list, this, PostActivities.this);
+            recyclerView.setAdapter(adapter);
+        }
+
     }
 
 
@@ -374,6 +378,7 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts{
         setRecyclerView();
         super.onRestart();
     }
+
     public void makeSelection(View view, int adapterPosition) {
         if (((CheckBox) view).isChecked()) {
             selected_posts.add(posts_list.get(adapterPosition));
@@ -387,7 +392,13 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts{
     }
 
     public void updateCounter() {
-        itemCounter.setText(this.counter + "Item Selected");
+        String sentense;
+        if (counter <= 1) {
+            sentense = " Item Selected";
+        } else {
+            sentense = " Items Selected";
+        }
+        itemCounter.setText(this.counter + sentense);
     }
 
     @Override
@@ -398,7 +409,8 @@ public class PostActivities extends AppCompatActivity implements actionOnPosts{
             RemoveContextualActionMenu();
         }
         if (item.getItemId() == R.id.share) {
-
+//            adapter.sendSelectedPosts(selected_posts);
+//            RemoveContextualActionMenu();
         }
         return true;
     }

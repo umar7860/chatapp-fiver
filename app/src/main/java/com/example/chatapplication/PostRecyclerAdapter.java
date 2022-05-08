@@ -90,6 +90,14 @@ public class PostRecyclerAdapter extends RecyclerView.Adapter<PostRecyclerAdapte
         }
     }
 
+//    public void sendSelectedPosts(List<Post> selected_posts) {
+//        postDetailActivity postDetail = new postDetailActivity();
+//        for (int i = 0; i < selected_posts.size(); i++) {
+//            postDetail.sendEmail(selected_posts.get(i).getImage(),selected_posts.get(i).getMessage());
+//        }
+//
+//    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView imageView;
         public TextView textView;

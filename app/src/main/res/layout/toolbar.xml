@@ -14,7 +14,7 @@
            android:layout_height="wrap_content"
            android:textSize="20sp"
            android:textColor="@color/white"
-           android:text="0 item selected"
+           android:text="Posts"
            android:id="@+id/itemCounter"/>
     </RelativeLayout>
 </androidx.appcompat.widget.Toolbar>
